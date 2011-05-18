@@ -90,6 +90,7 @@
 @implementation RootViewController
 
 @synthesize documentsBookPath;
+@synthesize documentsBookStoragePath;
 @synthesize bundleBookPath;
 
 @synthesize pages;
@@ -169,6 +170,7 @@
 	NSString *documentsPath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
 	
 	self.documentsBookPath = [documentsPath stringByAppendingPathComponent:@"book"];
+    self.documentsBookStoragePath = [documentsPath stringByAppendingPathComponent:@"book-storage"];
 	self.bundleBookPath = [[NSBundle mainBundle] pathForResource:@"book" ofType:nil];
     
     // ****** INDEX WEBVIEW INIT
@@ -668,13 +670,26 @@
 					}
 					
 					// *** Download book
+                    
+                    
 					self.URLDownload = [@"http:" stringByAppendingString:[url resourceSpecifier]];
 					
 					if ([[[NSURL URLWithString:self.URLDownload] pathExtension] isEqualToString:@""]) {
 						self.URLDownload = [self.URLDownload stringByAppendingString:@".hpub"];
 					}
-					
-					[self downloadBook:nil];
+                    
+                    // -- Make sure book isn't in storage
+                    NSString* possibleStoragePath = [self.documentsBookStoragePath stringByAppendingPathComponent:
+                                                     [[NSURL URLWithString:self.URLDownload] lastPathComponent]];
+                    if([[NSFileManager defaultManager] fileExistsAtPath:possibleStoragePath]){
+                        // Skip straight to extraction
+                        NSLog(@"Detected we already have a cached version of this book at %@", possibleStoragePath);
+                        [self extractWithDialog:possibleStoragePath];
+                    }
+                    else{
+                        NSLog(@"No book at %@", possibleStoragePath);
+                        [self downloadBook:nil];
+                    }
 				}
 			} else {
 				// ****** Handle: *
@@ -913,21 +928,7 @@
 		
 		NSLog(@"Data received succesfully");
 		
-		feedbackAlert = [[UIAlertView alloc] initWithTitle:EXTRACT_FEEDBACK_TITLE
-												   message:nil
-												  delegate:self
-										 cancelButtonTitle:nil
-										 otherButtonTitles:nil];
-				
-		UIActivityIndicatorView *extractingWheel = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(124,50,37,37)];
-		extractingWheel.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
-		[extractingWheel startAnimating];
 		
-		[feedbackAlert addSubview:extractingWheel];
-		[feedbackAlert show];
-		
-		[extractingWheel release];
-		[feedbackAlert release];
 		
 		[self performSelector:@selector(manageDownloadData:) withObject:[requestSummary objectForKey:@"data"] afterDelay:0.1];
 	}
@@ -936,31 +937,69 @@
 			
 	NSArray *URLSections = [URLDownload pathComponents];
 	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingString:[URLSections lastObject]];
-		
+    NSFileManager* NSFm = [NSFileManager defaultManager];
 	[data writeToFile:targetPath atomically:YES];
 			
-	if ([[NSFileManager defaultManager] fileExistsAtPath:targetPath]) {
+	if ([NSFm fileExistsAtPath:targetPath]) {
+        NSString *storagePath = [self.documentsBookStoragePath stringByAppendingPathComponent:[URLSections lastObject]];
 		NSLog(@"File create successfully! Path: %@", targetPath);
 		
-		NSString *destinationPath = self.documentsBookPath;
-		NSLog(@"Book destination path: %@", destinationPath);
 		
-		// If a "book" directory already exists remove it (quick solution, improvement needed) 
-		if ([[NSFileManager defaultManager] fileExistsAtPath:destinationPath])
-			[[NSFileManager defaultManager] removeItemAtPath:destinationPath error:NULL];
 		
-		[SSZipArchive unzipFileAtPath:targetPath toDestination:destinationPath];
+		NSLog(@"Book successfully downloaded. Moving .hpub file to %@", storagePath);
+        if(![NSFm fileExistsAtPath:self.documentsBookStoragePath isDirectory:NULL])
+            if(![NSFm createDirectoryAtPath:self.documentsBookStoragePath withIntermediateDirectories:TRUE attributes:NULL error:NULL])
+                NSLog(@"Error: Create folder failed");
+		[NSFm moveItemAtPath:targetPath toPath:storagePath error:NULL];
+        
+        
+        
+		[self extractWithDialog:storagePath];
 		
-		NSLog(@"Book successfully unzipped. Removing .hpub file");
-		[[NSFileManager defaultManager] removeItemAtPath:targetPath error:NULL];
 		
-		currentPageIsDelayingLoading = YES;
-		
-		[feedbackAlert dismissWithClickedButtonIndex:feedbackAlert.cancelButtonIndex animated:YES];
-		[self initBook:destinationPath];
-	} /* else {
-	   Do something if it was not possible to write the book file on the iPhone/iPad file system...
+	} else {
+	   // Do something if it was not possible to write the book file on the iPhone/iPad file system...
+        NSLog(@"Unable to write file (not enough free space?)");
 	} /**/
+}
+
+-(void)extractAndInitBookAtPath:(NSString*)targetPath {
+    NSString *destinationPath = self.documentsBookPath;
+    NSLog(@"Book destination path: %@", destinationPath);
+    
+    // If a "book" directory already exists remove it (quick solution, improvement needed) 
+    if ([[NSFileManager defaultManager] fileExistsAtPath:destinationPath])
+        [[NSFileManager defaultManager] removeItemAtPath:destinationPath error:NULL];
+    [SSZipArchive unzipFileAtPath:targetPath toDestination:destinationPath];
+    
+    [feedbackAlert dismissWithClickedButtonIndex:feedbackAlert.cancelButtonIndex animated:YES];
+    
+    currentPageIsDelayingLoading = YES;
+    
+    [self initBook:destinationPath];
+}
+
+-(void)extractWithDialog:(NSString*)targetPath{
+    feedbackAlert = [[UIAlertView alloc] initWithTitle:EXTRACT_FEEDBACK_TITLE
+                                               message:nil
+                                              delegate:self
+                                     cancelButtonTitle:nil
+                                     otherButtonTitles:nil];
+    
+    UIActivityIndicatorView *extractingWheel = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(124,50,37,37)];
+    extractingWheel.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
+    [extractingWheel startAnimating];
+    
+    [feedbackAlert addSubview:extractingWheel];
+    [feedbackAlert show];
+    
+    [extractingWheel release];
+    [feedbackAlert release];
+    
+    
+    [self performSelector:@selector(extractAndInitBookAtPath:) withObject:targetPath afterDelay:0.1];
+    
+    
 }
 
 // ****** SYSTEM

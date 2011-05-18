@@ -79,6 +79,7 @@
 }
 
 @property (nonatomic, retain) NSString *documentsBookPath;
+@property (nonatomic, retain) NSString *documentsBookStoragePath;
 @property (nonatomic, retain) NSString *bundleBookPath;
 
 @property (nonatomic, retain) NSMutableArray *pages;
@@ -140,5 +141,7 @@
 - (void)startDownloadRequest;
 - (void)handleDownloadResult:(NSNotification *)notification;
 - (void)manageDownloadData:(NSData *)data;
+- (void)extractAndInitBookAtPath:(NSString*)targetPath;
+- (void)extractWithDialog:(NSString*)targetPath;
 
 @end
