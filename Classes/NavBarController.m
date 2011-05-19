@@ -11,11 +11,15 @@
 
 @implementation NavBarController
 
+@synthesize shelf;
+
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+        popoverShowing = NO;
     }
     return self;
 }
@@ -43,11 +47,21 @@
     navBar.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     navBar.barStyle = UIBarStyleBlackTranslucent;
     navBar.delegate = self;
-        
+    
+    
     self.view = navBar;
     [self fadeOut];
+    
+    UINavigationItem* navItem = [[UINavigationItem alloc] initWithTitle:@"Baker"];
+    bookmarkButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(togglePopover)];
+    [navItem setRightBarButtonItem:bookmarkButton];
+    [navBar pushNavigationItem:navItem animated:NO];
     [navBar release];
-
+    
+    self.shelf = [[ShelfViewController alloc] initWithNibName:nil bundle:nil];
+    popover = [[UIPopoverController alloc] initWithContentViewController:self.shelf];
+    
+    
 }
 
 
@@ -121,13 +135,31 @@
 
 - (void)willRotate {
     [self fadeOut];
+    [self hidePopoverWithAnimation:NO];
 }
 
 - (void)resetFrameSize:(CGRect)frame {
     BOOL hidden = [self isHidden]; // cache hidden status before setting page size
     self.view.frame = frame;
-    
     [self setHidden:hidden withAnimation:YES];
+}
+
+-(void)togglePopover{
+    if(popoverShowing){
+        [self hidePopoverWithAnimation:YES];
+    }
+    else{
+        [self showPopover];
+    }
+}
+
+-(void)showPopover{
+    popoverShowing = YES;
+    [popover presentPopoverFromBarButtonItem:bookmarkButton permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+}
+-(void)hidePopoverWithAnimation:(BOOL)anim{
+    [popover dismissPopoverAnimated:anim];
+    popoverShowing = NO;
 }
 
 @end
