@@ -122,10 +122,10 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadBook:) name:@"downloadNotification" object:nil];
 	
 	[self checkPageSize];
+    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
 	
 	discardNextStatusBarToggle = NO;
 	stackedScrollingAnimations = 0;
-	[self hideStatusBar];
 	
 	// ****** SCROLLVIEW INIT
 	scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, pageWidth, pageHeight)];
@@ -175,9 +175,15 @@
     
     // ****** INDEX WEBVIEW INIT
     indexViewController = [[IndexViewController alloc] initWithBookBundlePath:self.bundleBookPath documentsBookPath:self.documentsBookPath fileName:INDEX_FILE_NAME webViewDelegate:self];
+    navBarController = [[NavBarController alloc] initWithNibName:nil bundle:nil];
+    [navBarController setHidden:YES withAnimation:NO];
+	[self hideStatusBar];
+	[self checkPageSize];
+    
     
     [[self view] addSubview:indexViewController.view];
-	
+	[[self view] addSubview:navBarController.view];
+    
 	if ([[NSFileManager defaultManager] fileExistsAtPath:documentsBookPath]) {
         [self initBook:documentsBookPath];
 	} else {
@@ -213,6 +219,16 @@
 		pageWidth = screenBounds.size.height;
 		pageHeight = screenBounds.size.width;
 	}
+    
+    // Tell the nav bar about our resize
+    CGRect bounds = scrollView.bounds;
+    CGSize navBarSize = [navBarController.view sizeThatFits:bounds.size];
+    UIApplication *sharedApplication = [UIApplication sharedApplication];
+	int scrollViewY = 20;
+	if (!sharedApplication.statusBarHidden) {
+		scrollViewY = 0;
+	}
+    [navBarController resetFrameSize:CGRectMake(0, scrollViewY, navBarSize.width, navBarSize.height)];
 }
 - (void)resetScrollView {
 	for (id subview in scrollView.subviews) {
@@ -856,9 +872,12 @@
 	} else {
 		NSLog(@"TOGGLE status bar");
 		UIApplication *sharedApplication = [UIApplication sharedApplication];
-		[sharedApplication setStatusBarHidden:!sharedApplication.statusBarHidden withAnimation:UIStatusBarAnimationSlide];
+        BOOL willHide = !sharedApplication.statusBarHidden;
+		[sharedApplication setStatusBarHidden:willHide withAnimation:UIStatusBarAnimationSlide];
         if(![indexViewController isDisabled]) 
             [indexViewController setIndexViewHidden:![indexViewController isIndexViewHidden] withAnimation:YES];
+        [navBarController setHidden:willHide withAnimation:YES];
+        
 	}
 }
 - (void)hideStatusBar {
@@ -870,6 +889,7 @@
 	[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     if(![indexViewController isDisabled]) 
         [indexViewController setIndexViewHidden:YES withAnimation:YES];
+    [navBarController setHidden:YES withAnimation:YES];
 }
 
 // ****** DOWNLOAD NEW BOOKS
@@ -1014,8 +1034,9 @@
 	}	
 }
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    // Notify the index view
+    // Notify the other views
     [indexViewController willRotate];
+    [navBarController willRotate];
     
     // Since the UIWebView doesn't handle orientationchange events correctly we have to do handle them ourselves 
     // 1. Set the correct value for window.orientation property
@@ -1050,10 +1071,13 @@
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
     [indexViewController rotateFromOrientation:fromInterfaceOrientation toOrientation:orientation];
-     
+
 	[self checkPageSize];
 	[self getPageHeight];
 	[self resetScrollView];
+    
+    
+    
     [currPage setNeedsDisplay];
 }
 - (void)didReceiveMemoryWarning {

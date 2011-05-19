@@ -12,6 +12,7 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
+		96267965138573DE00B7D1BD /* NavBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96267964138573DE00B7D1BD /* NavBarController.m */; };
 		9F123763129F133700B7E8C8 /* Downloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 9F123762129F133700B7E8C8 /* Downloader.m */; };
 		9F242EDA11FB344D00641757 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F242ED911FB344D00641757 /* QuartzCore.framework */; };
 		9F4F07F411F8DE8200375A8C /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9F4F07F211F8DE8200375A8C /* RootViewController.m */; };
@@ -82,6 +83,8 @@
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* Baker_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Baker_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Baker-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Baker-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		96267963138573DE00B7D1BD /* NavBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavBarController.h; sourceTree = "<group>"; };
+		96267964138573DE00B7D1BD /* NavBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavBarController.m; sourceTree = "<group>"; };
 		9F123761129F133700B7E8C8 /* Downloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Downloader.h; sourceTree = "<group>"; };
 		9F123762129F133700B7E8C8 /* Downloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Downloader.m; sourceTree = "<group>"; };
 		9F242ED911FB344D00641757 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -172,12 +175,14 @@
 				9F6E6B4C12AAA0950019EFB6 /* minizip */,
 				9F6E6B4A12AAA0950019EFB6 /* SSZipArchive.m */,
 				9F6E6B4B12AAA0950019EFB6 /* SSZipArchive.h */,
+				96267963138573DE00B7D1BD /* NavBarController.h */,
+				96267964138573DE00B7D1BD /* NavBarController.m */,
 				D2A198A81375972600C6BE2F /* IndexViewController.h */,
 				D2A198A91375972600C6BE2F /* IndexViewController.m */,
 				9F4F07F111F8DE8200375A8C /* RootViewController.h */,
 				9F4F07F211F8DE8200375A8C /* RootViewController.m */,
-				1D3623240D0F684500981E51 /* BakerAppDelegate.h */,
 				1D3623250D0F684500981E51 /* BakerAppDelegate.m */,
+				1D3623240D0F684500981E51 /* BakerAppDelegate.h */,
 				F4EC203612862D4D008E94D1 /* InterceptorWindow.h */,
 				F4EC203712862D4D008E94D1 /* InterceptorWindow.m */,
 				9F123761129F133700B7E8C8 /* Downloader.h */,
@@ -457,6 +462,7 @@
 				BFF823C6138055F600562F57 /* CJSONDeserializer.m in Sources */,
 				BFF823C8138055F600562F57 /* CJSONScanner.m in Sources */,
 				BFF823CA138055F600562F57 /* CJSONSerializer.m in Sources */,
+				96267965138573DE00B7D1BD /* NavBarController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
