@@ -11,12 +11,12 @@
 
 @interface NavBarController : UIViewController {
     BOOL popoverShowing;
-    ShelfViewController* shelf;
+    ShelfViewController* shelfViewController;
     UIPopoverController* popover;
     UIBarButtonItem* bookmarkButton;
 }
 
-@property (nonatomic,retain) ShelfViewController* shelf;
+@property (nonatomic,retain) ShelfViewController* shelfViewController;
 
 - (BOOL)isHidden;
 - (void)setHidden:(BOOL)hidden withAnimation:(BOOL)animation;

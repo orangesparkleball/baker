@@ -11,7 +11,7 @@
 
 @implementation NavBarController
 
-@synthesize shelf;
+@synthesize shelfViewController;
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -58,8 +58,8 @@
     [navBar pushNavigationItem:navItem animated:NO];
     [navBar release];
     
-    self.shelf = [[ShelfViewController alloc] initWithNibName:nil bundle:nil];
-    popover = [[UIPopoverController alloc] initWithContentViewController:self.shelf];
+    self.shelfViewController = [[ShelfViewController alloc] initWithNibName:nil bundle:nil];
+    popover = [[UIPopoverController alloc] initWithContentViewController:self.shelfViewController];
     
     
 }
