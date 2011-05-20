@@ -91,7 +91,6 @@
 @synthesize shelf;
 @synthesize book;
 
-@synthesize pages;
 @synthesize pageNameFromURL;
 @synthesize anchorFromURL;
 

@@ -44,7 +44,6 @@
 	Shelf* shelf;
     Book* book;
 	
-	NSMutableArray *pages;
 	NSString *pageNameFromURL;
 	NSString *anchorFromURL;
 	
@@ -60,7 +59,6 @@
 	CGRect leftTapArea;
 	CGRect rightTapArea;
 
-	int totalPages;
 	int currentPageNumber;
 	int currentPageHeight;
 	int stackedScrollingAnimations;
@@ -82,7 +80,6 @@
 @property (nonatomic, retain) Shelf *shelf;
 @property (nonatomic, retain) Book *book;
 
-@property (nonatomic, retain) NSMutableArray *pages;
 @property (nonatomic, retain) NSString *pageNameFromURL;
 @property (nonatomic, retain) NSString *anchorFromURL;
 
@@ -109,7 +106,6 @@
 - (void)gotoPage;
 - (void)initPageNumbersForPages:(int)count;
 - (BOOL)loadSlot:(int)slot withPage:(int)page;
-- (BOOL)loadWebView:(UIWebView*)webview withPage:(int)page;
 
 // ****** SCROLLVIEW
 - (CGRect)frameForPage:(int)page;
