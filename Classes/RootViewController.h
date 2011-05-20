@@ -32,7 +32,8 @@
 
 #import <UIKit/UIKit.h>
 #import "IndexViewController.h"
-
+#import "Shelf.h"
+#import "Book.h"
 
 @class Downloader;
 
@@ -40,8 +41,8 @@
 	
 	CGRect screenBounds;
 	
-	NSString *documentsBookPath;
-	NSString *bundleBookPath;
+	Shelf* shelf;
+    Book* book;
 	
 	NSMutableArray *pages;
 	NSString *pageNameFromURL;
@@ -78,8 +79,8 @@
     IndexViewController *indexViewController;
 }
 
-@property (nonatomic, retain) NSString *documentsBookPath;
-@property (nonatomic, retain) NSString *bundleBookPath;
+@property (nonatomic, retain) Shelf *shelf;
+@property (nonatomic, retain) Book *book;
 
 @property (nonatomic, retain) NSMutableArray *pages;
 @property (nonatomic, retain) NSString *pageNameFromURL;
@@ -99,7 +100,7 @@
 // ****** INIT
 - (void)checkPageSize;
 - (void)setPageSize:(NSString *)orientation;
-- (void)initBook:(NSString *)path;
+- (void)initBook:(Book *)book;
 
 // ****** LOADING
 - (NSDictionary*)loadManifest:(NSString*)file;

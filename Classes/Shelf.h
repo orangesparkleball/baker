@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "SSZipArchive.h"
+#import "Book.h"
 
 @interface Shelf : NSObject {
     NSString* bundledBookPath;
@@ -19,4 +20,12 @@
 @property (nonatomic,retain) NSString* currentBookPath;
 @property (nonatomic,retain) NSString* bookStoragePath;
 
+- (NSString*) openBookPath;
+- (Book*) openBook;
+- (Book*) bundledBook;
+- (void) trashBook:(Book*)book;
+- (BOOL) bookAvailable;
+- (BOOL) bundledBookAvailable;
+- (BOOL) currentBookAvailable;
+- (BOOL) handleDownloadedBookAtPath:(NSString *)targetPath;
 @end

@@ -46,6 +46,7 @@
 - (id)initWithBookBundlePath:(NSString *)path documentsBookPath:(NSString *)docpath fileName:(NSString *)name webViewDelegate:(UIViewController *)delegate;
 - (void)loadContent;
 - (void)loadContentFromBundle:(BOOL)fromBundle;
+- (void)loadContentFromPath:(NSString*)path;
 - (void)setBounceForWebView:(UIWebView *)webView bounces:(BOOL)bounces;
 - (void)setPageSizeForOrientation:(UIInterfaceOrientation)orientation;
 - (BOOL)isIndexViewHidden;

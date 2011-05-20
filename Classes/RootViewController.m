@@ -32,7 +32,6 @@
 #import <QuartzCore/QuartzCore.h>
 #import "RootViewController.h"
 #import "Downloader.h"
-#import "SSZipArchive.h"
 #import "NSDictionary_JSONExtensions.h"
 
 // LOADER STYLE
@@ -89,8 +88,8 @@
 
 @implementation RootViewController
 
-@synthesize documentsBookPath;
-@synthesize bundleBookPath;
+@synthesize shelf;
+@synthesize book;
 
 @synthesize pages;
 @synthesize pageNameFromURL;
@@ -165,26 +164,20 @@
 		
 	[[self view] addSubview:scrollView];
 	
-	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-	NSString *documentsPath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
-	
-	self.documentsBookPath = [documentsPath stringByAppendingPathComponent:@"book"];
-	self.bundleBookPath = [[NSBundle mainBundle] pathForResource:@"book" ofType:nil];
+    self.shelf = [[Shelf alloc] init];
     
     // ****** INDEX WEBVIEW INIT
-    indexViewController = [[IndexViewController alloc] initWithBookBundlePath:self.bundleBookPath documentsBookPath:self.documentsBookPath fileName:INDEX_FILE_NAME webViewDelegate:self];
+    indexViewController = [[IndexViewController alloc] initWithBookBundlePath:[shelf bundledBookPath] documentsBookPath:[shelf currentBookPath] fileName:INDEX_FILE_NAME webViewDelegate:self];
     
     [[self view] addSubview:indexViewController.view];
 	
-	if ([[NSFileManager defaultManager] fileExistsAtPath:documentsBookPath]) {
-        [self initBook:documentsBookPath];
-	} else {
-		if ([[NSFileManager defaultManager] fileExistsAtPath:bundleBookPath]) {
-			[self initBook:bundleBookPath];
-		} /* else {
-		   Do something if there are no books available to show...   
-		} /**/
-	}
+    if ([shelf bookAvailable]){
+        [self initBook:[shelf openBook]];
+    }
+     /* else {
+      Do something if there are no books available to show...   
+      } /**/
+
 	
 	return self;
 }
@@ -219,7 +212,7 @@
 		}
 	}
 
-	scrollView.contentSize = CGSizeMake(pageWidth * totalPages, pageHeight);
+	scrollView.contentSize = CGSizeMake(pageWidth * [self.book totalPages], pageHeight);
 	
 	UIApplication *sharedApplication = [UIApplication sharedApplication];
 	int scrollViewY = 0;
@@ -228,7 +221,7 @@
 	}
 	scrollView.frame = CGRectMake(0, scrollViewY, pageWidth, pageHeight);
 	
-	[self initPageNumbersForPages:totalPages];
+	[self initPageNumbersForPages:[self.book totalPages]];
 
 	//prevPage.frame = [self frameForPage:currentPageNumber-1];
 	currPage.frame = [self frameForPage:currentPageNumber];
@@ -247,54 +240,25 @@
 	leftTapArea = CGRectMake(0, tappableAreaSize, tappableAreaSize, pageHeight - (tappableAreaSize * 2));
 	rightTapArea = CGRectMake(pageWidth - tappableAreaSize, tappableAreaSize, tappableAreaSize, pageHeight - (tappableAreaSize * 2));
 }
-- (void)initBook:(NSString *)path {
+- (void)initBook:(Book *)newBook {
+    self.book = newBook;
 	
-	// Count pages
-	if (self.pages != nil)
-		[self.pages removeAllObjects];
-	else
-		self.pages = [NSMutableArray array];
-	
-	NSArray *dirContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:nil];
-	for (NSString *fileName in dirContent) {
-		if ([[fileName pathExtension] isEqualToString:@"html"] && ![fileName isEqualToString:INDEX_FILE_NAME])
-			[self.pages addObject:[path stringByAppendingPathComponent:fileName]];
-	}
+	if ([self.book totalPages] > 0) {
 		
-	totalPages = [pages count];
-	NSLog(@"Pages in this book: %d", totalPages);
-	
-	if (totalPages > 0) {
-		// Check if there is a saved starting page
-		NSString *currPageToLoad = [[NSUserDefaults standardUserDefaults] objectForKey:@"lastPageViewed"];
+        currentPageNumber = [self.book currentPageWithURL:pageNameFromURL andFirstLoad:currentPageFirstLoading];
 		
-		if (currentPageFirstLoading && currPageToLoad != nil) {
-			currentPageNumber = [currPageToLoad intValue];
-		} else {
-			
-			currentPageNumber = 1;
-			if (self.pageNameFromURL != nil) { 
-				NSString *fileNameFromURL = [path stringByAppendingPathComponent:self.pageNameFromURL];
-				self.pageNameFromURL = nil;
-				for (int i = 0; i < totalPages; i++) {
-					if ([[pages objectAtIndex:i] isEqualToString:fileNameFromURL]) {
-						currentPageNumber = i+1;
-						break;
-					}
-				}
-			}
-		}
 		
 		[self resetScrollView];
 		//[scrollView addSubview:prevPage];
 		[scrollView addSubview:currPage];
 		//[scrollView addSubview:nextPage];
 		[self loadSlot:0 withPage:currentPageNumber];
-        [indexViewController loadContentFromBundle:[path isEqualToString:bundleBookPath]];
+        [indexViewController loadContentFromPath:[self.book indexPath]];
         
 	} else {
 		
-		[[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
+        [shelf trashBook:self.book];
+        self.book = nil;
 		
  		feedbackAlert = [[UIAlertView alloc] initWithTitle:ZERO_PAGES_TITLE
 												   message:ZERO_PAGES_MESSAGE
@@ -304,9 +268,10 @@
 		[feedbackAlert show];
 		[feedbackAlert release];
 		
-		[self initBook:bundleBookPath];
+		[self initBook:[shelf bundledBook]];
 	}
 }
+
 - (void)initPageNumbersForPages:(int)count {
 	pageSpinners = [[NSMutableArray alloc] initWithCapacity:count];
 	
@@ -378,8 +343,8 @@
 	
     if (page < 1) {
 		currentPageNumber = 1;
-	} else if (page > totalPages) {
-		currentPageNumber = totalPages;
+	} else if (page > [self.book totalPages]) {
+		currentPageNumber = [self.book totalPages];
 	} else if (page != currentPageNumber) {
 		currentPageNumber = page;
         
@@ -415,7 +380,7 @@
 	//NSString *file = [NSString stringWithFormat:@"%d", currentPageNumber];
 	//NSString *path = [[NSBundle mainBundle] pathForResource:file ofType:@"html" inDirectory:@"book"];
 		
-	NSString *path = [pages objectAtIndex:currentPageNumber-1];
+	NSString *path = [book.pages objectAtIndex:currentPageNumber-1];
 		
 	if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
 		NSLog(@"Goto Page: book/%@", [[NSFileManager defaultManager] displayNameAtPath:path]);
@@ -483,7 +448,7 @@
 	webView.delegate = self;
 	[[self view] addSubview:webView];
 	[[self view] sendSubviewToBack:webView]; /**/
-	[self loadWebView:webView withPage:page];
+	[self.book openPage:page inView:webView];
 	[self spinnerForPage:page isAnimating:YES]; // spinner YES
 	
 	// ****** ATTACH
@@ -497,21 +462,7 @@
 	
 	return NO;
 }
-- (BOOL)loadWebView:(UIWebView*)webView withPage:(int)page {
-	
-	//NSString *file = [NSString stringWithFormat:@"%d", page];
-	//NSString *path = [[NSBundle mainBundle] pathForResource:file ofType:@"html" inDirectory:@"book"];
-	
-	NSString *path = [pages objectAtIndex:page-1];
-		
-	if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
-		NSLog(@"[+] Loading: book/%@", [[NSFileManager defaultManager] displayNameAtPath:path]);
-		webView.hidden = YES; // use direct property instead of [self webView:hidden:animating:] otherwise it won't work
-		[webView loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:path]]];
-		return YES;
-	}
-	return NO;
-}
+
 
 // ****** SCROLLVIEW
 - (CGRect)frameForPage:(int)page {
@@ -630,17 +581,18 @@
 		// ****** Handle URI schemes
 		if (url) {
 			// Existing, checking schemes...
-			if([[url lastPathComponent] isEqualToString:INDEX_FILE_NAME]){
+			if([[url lastPathComponent] isEqualToString:[self.book indexPathComponent]]){
                 NSLog(@"Matches index file name.");
                 return YES; // Let the index view load
             }
 			if ([[url scheme] isEqualToString:@"file"]) {
 				// ****** Handle: file://
-				NSLog(@"file:// ->");
+				NSString *file = [[url relativePath] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+				NSLog(@"file:// -> %@", file);
 				
 				self.anchorFromURL = [url fragment];
-				NSString *file = [[url relativePath] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-				int page = (int)[pages indexOfObject:file] + 1;
+				int page = (int)[book.pages indexOfObject:file] + 1;
+                
 				if (![self changePage:page]) {
 					[self handleAnchor:NO];
 				}
@@ -649,7 +601,7 @@
 				// ****** Handle: book://
 				NSLog(@"book:// ->");
 				
-				if ([[url host] isEqualToString:@"local"] && [[NSFileManager defaultManager] fileExistsAtPath:bundleBookPath]) {
+				if ([[url host] isEqualToString:@"local"] && [shelf bundledBookAvailable]) {
 					// *** Back to bundled book
 					feedbackAlert = [[UIAlertView alloc] initWithTitle:@""
 															   message:[NSString stringWithFormat:CLOSE_BOOK_MESSAGE]
@@ -877,7 +829,8 @@
 	if (buttonIndex != alertView.cancelButtonIndex) {
 		if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:CLOSE_BOOK_CONFIRM]){
             currentPageIsDelayingLoading = YES;
-			[self initBook:bundleBookPath];
+            [shelf trashBook:self.book];
+			[self initBook:[shelf bundledBook]];
         }
 		else{
 			[self startDownloadRequest];
@@ -936,31 +889,15 @@
 			
 	NSArray *URLSections = [URLDownload pathComponents];
 	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingString:[URLSections lastObject]];
-		
+	
 	[data writeToFile:targetPath atomically:YES];
-			
-	if ([[NSFileManager defaultManager] fileExistsAtPath:targetPath]) {
-		NSLog(@"File create successfully! Path: %@", targetPath);
-		
-		NSString *destinationPath = self.documentsBookPath;
-		NSLog(@"Book destination path: %@", destinationPath);
-		
-		// If a "book" directory already exists remove it (quick solution, improvement needed) 
-		if ([[NSFileManager defaultManager] fileExistsAtPath:destinationPath])
-			[[NSFileManager defaultManager] removeItemAtPath:destinationPath error:NULL];
-		
-		[SSZipArchive unzipFileAtPath:targetPath toDestination:destinationPath];
-		
-		NSLog(@"Book successfully unzipped. Removing .hpub file");
-		[[NSFileManager defaultManager] removeItemAtPath:targetPath error:NULL];
-		
-		currentPageIsDelayingLoading = YES;
-		
-		[feedbackAlert dismissWithClickedButtonIndex:feedbackAlert.cancelButtonIndex animated:YES];
-		[self initBook:destinationPath];
-	} /* else {
-	   Do something if it was not possible to write the book file on the iPhone/iPad file system...
-	} /**/
+	[shelf handleDownloadedBookAtPath:targetPath];
+    
+    currentPageIsDelayingLoading = YES;
+    
+    [feedbackAlert dismissWithClickedButtonIndex:feedbackAlert.cancelButtonIndex animated:YES];
+    [self initBook:[shelf openBook]];
+    
 }
 
 // ****** SYSTEM
