@@ -34,6 +34,8 @@
 #import "IndexViewController.h"
 #import "NavBarController.h"
 
+#import "Shelf.h"
+#import "Book.h"
 
 @class Downloader;
 
@@ -41,10 +43,9 @@
 	
 	CGRect screenBounds;
 	
-	NSString *documentsBookPath;
-	NSString *bundleBookPath;
+	Shelf* shelf;
+    Book* book;
 	
-	NSMutableArray *pages;
 	NSString *pageNameFromURL;
 	NSString *anchorFromURL;
 	
@@ -60,7 +61,6 @@
 	CGRect leftTapArea;
 	CGRect rightTapArea;
 
-	int totalPages;
 	int currentPageNumber;
 	int currentPageHeight;
 	int stackedScrollingAnimations;
@@ -80,11 +80,9 @@
     NavBarController  *navBarController;
 }
 
-@property (nonatomic, retain) NSString *documentsBookPath;
-@property (nonatomic, retain) NSString *documentsBookStoragePath;
-@property (nonatomic, retain) NSString *bundleBookPath;
+@property (nonatomic, retain) Shelf *shelf;
+@property (nonatomic, retain) Book *book;
 
-@property (nonatomic, retain) NSMutableArray *pages;
 @property (nonatomic, retain) NSString *pageNameFromURL;
 @property (nonatomic, retain) NSString *anchorFromURL;
 
@@ -102,7 +100,7 @@
 // ****** INIT
 - (void)checkPageSize;
 - (void)setPageSize:(NSString *)orientation;
-- (void)initBook:(NSString *)path;
+- (void)initBook:(Book *)book;
 
 // ****** LOADING
 - (NSDictionary*)loadManifest:(NSString*)file;
@@ -111,7 +109,6 @@
 - (void)gotoPage;
 - (void)initPageNumbersForPages:(int)count;
 - (BOOL)loadSlot:(int)slot withPage:(int)page;
-- (BOOL)loadWebView:(UIWebView*)webview withPage:(int)page;
 
 // ****** SCROLLVIEW
 - (CGRect)frameForPage:(int)page;
@@ -143,7 +140,6 @@
 - (void)startDownloadRequest;
 - (void)handleDownloadResult:(NSNotification *)notification;
 - (void)manageDownloadData:(NSData *)data;
-- (void)extractAndInitBookAtPath:(NSString*)targetPath;
 - (void)extractWithDialog:(NSString*)targetPath;
 
 @end

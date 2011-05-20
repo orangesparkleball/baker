@@ -178,6 +178,10 @@
         
         path = [documentsBookPath stringByAppendingPathComponent:fileName];
     }
+    [self loadContentFromPath:path];
+}
+
+- (void)loadContentFromPath:(NSString*)path{
     NSLog(@"Path to index view is %@", path);
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
         disabled = NO;
