@@ -7,12 +7,23 @@
 //
 
 #import "NavBarController.h"
+#import "RootViewController.h"
+
+
 
 
 @implementation NavBarController
 
 @synthesize shelfViewController;
+@synthesize rootViewController;
+@synthesize shelf;
 
+- (id) initWithShelf:(Shelf*) newShelf andRootView:(RootViewController*)rootView{
+    self = [self initWithNibName:nil bundle:nil];
+    self.shelf = newShelf;
+    self.rootViewController = rootView;
+    return self;
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -58,11 +69,13 @@
     [navBar pushNavigationItem:navItem animated:NO];
     [navBar release];
     
-    self.shelfViewController = [[ShelfViewController alloc] initWithNibName:nil bundle:nil];
+    self.shelfViewController = [[ShelfViewController alloc] initWithShelf:shelf
+                                                                andNavBar:self];
     popover = [[UIPopoverController alloc] initWithContentViewController:self.shelfViewController];
-    
+    popover.popoverContentSize = CGSizeMake(300, 500);
     
 }
+
 
 
 /*
@@ -160,6 +173,12 @@
 -(void)hidePopoverWithAnimation:(BOOL)anim{
     [popover dismissPopoverAnimated:anim];
     popoverShowing = NO;
+}
+
+-(void)openBookAtPath:(NSString*)path{
+    [self hidePopoverWithAnimation:YES];
+    [rootViewController hideStatusBar];
+    [rootViewController extractWithDialog:path];
 }
 
 @end

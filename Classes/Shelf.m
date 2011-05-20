@@ -100,4 +100,7 @@
         return nil;
     }
 }
+- (NSArray*) storedBooks{
+    return [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.bookStoragePath error:nil];
+}
 @end

@@ -166,7 +166,9 @@
     
     // ****** INDEX WEBVIEW INIT
     indexViewController = [[IndexViewController alloc] initWithBookBundlePath:[shelf bundledBookPath] documentsBookPath:[shelf currentBookPath] fileName:INDEX_FILE_NAME webViewDelegate:self];
-    navBarController = [[NavBarController alloc] initWithNibName:nil bundle:nil];
+    
+    self.shelf = [[Shelf alloc] init];
+    navBarController = [[NavBarController alloc] initWithShelf: self.shelf andRootView:self];
     [navBarController setHidden:YES withAnimation:NO];
 	[self hideStatusBar];
 	[self checkPageSize];
@@ -176,7 +178,6 @@
     [[self view] addSubview:indexViewController.view];
 	[[self view] addSubview:navBarController.view];
     
-    self.shelf = [[Shelf alloc] init];
     
     
 	

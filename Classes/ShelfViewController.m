@@ -7,9 +7,19 @@
 //
 
 #import "ShelfViewController.h"
-
+#import "NavBarController.h"
 
 @implementation ShelfViewController
+
+@synthesize shelf;
+@synthesize navBarController;
+
+- (id) initWithShelf:(Shelf*) newShelf andNavBar:(NavBarController*)navBar{
+    self.shelf = newShelf;
+    self.navBarController = navBar;
+    self = [self initWithStyle:UITableViewStylePlain];
+    return self;
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -37,10 +47,10 @@
 #pragma mark - View lifecycle
 
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
-- (void)loadView
-{
-    
-}
+//- (void)loadView
+//{
+//    
+//}
 
 /*
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
@@ -63,4 +73,42 @@
     return YES;
 }
 
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    static NSString *CellIdentifier = @"Cell";
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil) {
+        cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero     reuseIdentifier:CellIdentifier] autorelease];
+    }
+    
+    cell.accessoryType = UITableViewCellAccessoryNone;
+    
+    cell.textLabel.text = [[shelf storedBooks] objectAtIndex:indexPath.row];
+    
+    return cell;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return [[shelf storedBooks] count];
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSString* item = [[shelf storedBooks] objectAtIndex:indexPath.row];
+    NSString* possibleStoragePath = [shelf containsStoredBook:item];
+    NSLog(@"Tapped on %@", item );
+    [navBarController openBookAtPath:possibleStoragePath];
+}
+
+
 @end
+
+
+
+
+
+
