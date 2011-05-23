@@ -30,4 +30,5 @@
 - (BOOL) extractBookAt:(NSString*)targetPath;
 - (NSString*) containsStoredBook:(NSString*)bookName;
 - (NSArray*) storedBooks;
+- (NSMutableArray*) storedBookInfo;
 @end

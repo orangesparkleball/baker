@@ -107,4 +107,21 @@
     return [dirContents filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self ENDSWITH '.hpub'"]];
 }
 
+- (NSMutableArray*) storedBookInfo{
+    NSArray* bookList = [self storedBooks];
+    NSMutableArray* manifests = [NSMutableArray array];
+    for(NSString* bookName in bookList){
+        NSLog(@"Peeking into hpub");
+        NSString* file = [SSZipArchive extractSingleFileFrom:[self.bookStoragePath stringByAppendingPathComponent:bookName] withName:[Book manifestPathComponent]];
+        if(file){
+            NSLog(@"Peek successful");
+            [manifests addObject:[Book loadManifest:file]];
+        }
+        else{
+            [manifests addObject:[NSDictionary dictionaryWithObject:[NSString stringWithString:bookName] forKey:@"title"]];
+        }
+    }
+    return manifests;
+}
+
 @end

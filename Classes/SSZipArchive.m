@@ -144,6 +144,97 @@
 	return success;
 }
 
++ (NSString*)extractSingleFileFrom:(NSString *)zipPath withName:(NSString*)searchedName{
+    // Begin opening
+	zipFile zip = unzOpen((const char*)[zipPath UTF8String]);	
+	if (zip == NULL) {
+		return nil;
+	}
+	
+	unz_global_info  globalInfo = {0};
+	unzGetGlobalInfo(zip, &globalInfo);
+	
+	// Begin unzipping
+	if (unzLocateFile(zip, (const char*)[searchedName UTF8String], 2) != UNZ_OK) {
+		return nil;
+	}
+	
+	int ret;
+	unsigned char buffer[4096] = {0};
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+	NSDate *nineteenEighty = [self _dateFor1980];
+			
+    ret = unzOpenCurrentFile(zip);
+    
+    if (ret != UNZ_OK) {
+        return nil;
+    }
+    
+    // Reading data and write to file
+    int read;
+    unz_file_info fileInfo = {0};
+    ret = unzGetCurrentFileInfo(zip, &fileInfo, NULL, 0, NULL, 0, NULL, 0);
+    if (ret != UNZ_OK) {
+        unzCloseCurrentFile(zip);
+        return nil;
+    }
+    
+    char *filename = (char *)malloc(fileInfo.size_filename + 1);
+    unzGetCurrentFileInfo(zip, &fileInfo, filename, fileInfo.size_filename + 1, NULL, 0, NULL, 0);
+    filename[fileInfo.size_filename] = '\0';
+    
+    // Check if it contains directory
+    NSString *strPath = [NSString stringWithCString:filename encoding:NSUTF8StringEncoding];
+    BOOL isDirectory = NO;
+    if (filename[fileInfo.size_filename-1] == '/' || filename[fileInfo.size_filename-1] == '\\') {
+        isDirectory = YES;
+    }
+    free(filename);
+    
+    // Contains a path
+    if ([strPath rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"/\\"]].location != NSNotFound) {
+        strPath = [strPath stringByReplacingOccurrencesOfString:@"\\" withString:@"/"];
+    }
+    
+    NSString* tmpFile = [NSTemporaryDirectory() stringByAppendingPathComponent: [NSString stringWithFormat: @"%.0f.%@", [NSDate timeIntervalSinceReferenceDate] * 1000.0, @"txt"]];
+    FILE *fp = fopen((const char*)[tmpFile UTF8String], "wb");
+    while (fp) {
+        read = unzReadCurrentFile(zip, buffer, 4096);
+        
+        if (read > 0) {
+            fwrite(buffer, read, 1, fp );
+        } else {
+            break;
+        }
+    }
+    
+    if (fp) {
+        fclose(fp);
+        
+        // Set the orignal datetime property
+        if (fileInfo.dosDate != 0) {
+            NSDate *orgDate = [[NSDate alloc] initWithTimeInterval:(NSTimeInterval)fileInfo.dosDate  sinceDate:nineteenEighty];
+            NSDictionary *attr = [NSDictionary dictionaryWithObject:orgDate forKey:NSFileModificationDate];
+            
+            if (attr) {
+                if ([fileManager setAttributes:attr ofItemAtPath:tmpFile error:nil] == NO) {
+                    // Can't set attributes 
+                    NSLog(@"Failed to set attributes");
+                }
+            }
+            [orgDate release];
+        }
+    }
+    
+    unzCloseCurrentFile( zip );
+	
+	
+	// Close
+	unzClose(zip);
+	
+	return tmpFile;
+}
+
 
 + (NSDate *)_dateFor1980 {
 	NSDateComponents *comps = [[NSDateComponents alloc] init];

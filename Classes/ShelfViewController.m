@@ -84,7 +84,7 @@
     
     cell.accessoryType = UITableViewCellAccessoryNone;
     
-    cell.textLabel.text = [[shelf storedBooks] objectAtIndex:indexPath.row];
+    cell.textLabel.text = [[[shelf storedBookInfo] objectAtIndex:indexPath.row] objectForKey:@"title"];
     
     return cell;
 }

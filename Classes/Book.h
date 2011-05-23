@@ -24,7 +24,7 @@
 @property (nonatomic,retain) NSString* version;
 
 - (Book*)initBookFromPath:(NSString*)path;
-- (NSDictionary*)loadManifest:(NSString*)file;
++ (NSDictionary*)loadManifest:(NSString*)file;
 - (NSMutableArray*)listOfPages;
 
 - (int)currentPageWithURL:(NSString*)url andFirstLoad:(BOOL)isFirstLoad;
@@ -36,6 +36,6 @@
 - (NSString*)indexPath;
 - (NSString*)indexPathComponent;
 - (NSString*)manifestPath;
-- (NSString*)manifestPathComponent;
++ (NSString*)manifestPathComponent;
 
 @end

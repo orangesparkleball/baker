@@ -32,7 +32,7 @@
         // Manifest found, load settings from it.
         
         NSLog(@"Manifest found at %@", [self manifestPath]);
-        NSDictionary* settings = [self loadManifest:[self manifestPath]];
+        NSDictionary* settings = [Book loadManifest:[self manifestPath]];
         self.title = [settings objectForKey:@"title"];
         self.version = [settings objectForKey:@"version"];
         self.meta = settings;
@@ -70,7 +70,7 @@
 }
 
 // ****** LOADING
-- (NSDictionary*)loadManifest:(NSString*)file {
++ (NSDictionary*)loadManifest:(NSString*)file {
     /****************************************************************************************************
 	 * Reads a JSON file from Application Bundle to a NSDictionary.
      *
@@ -112,7 +112,7 @@
 -(NSString*)manifestPath{
     return [bookPath stringByAppendingPathComponent:MANIFEST_FILE_NAME];
 }
--(NSString*)manifestPathComponent{
++(NSString*)manifestPathComponent{
     return MANIFEST_FILE_NAME;
 }
 
