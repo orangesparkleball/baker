@@ -7,8 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SSZipArchive.h"
-#import "Book.h"
+@class Book;
 
 @interface Shelf : NSObject {
     NSString* bundledBookPath;

@@ -7,26 +7,51 @@
 //
 
 #import "Book.h"
+
+#import "NSDictionary_JSONExtensions.h"
+
 #define INDEX_FILE_NAME @"index.html"
+#define MANIFEST_FILE_NAME @"manifest.json"
 
 
 @implementation Book
 
 @synthesize pages;
 @synthesize bookPath;
+@synthesize title;
+@synthesize meta;
+@synthesize version;
+@synthesize url;
 
 - (Book*)initBookFromPath:(NSString *)path{
     self =[super init];
     self.bookPath = path;
     self.pages = [NSMutableArray array];
- 
     [self.pages removeAllObjects];
-	
-	NSArray *dirContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:nil];
-	for (NSString *fileName in dirContent) {
-		if ([[fileName pathExtension] isEqualToString:@"html"] && ![fileName isEqualToString:INDEX_FILE_NAME])
-			[self.pages addObject:[path stringByAppendingPathComponent:fileName]];
-	}
+    
+    if([[NSFileManager defaultManager] fileExistsAtPath:[self manifestPath]]){
+        // Manifest found, load settings from it.
+        
+        NSLog(@"Manifest found at %@", [self manifestPath]);
+        NSDictionary* settings = [self loadManifest:[self manifestPath]];
+        self.title = [settings objectForKey:@"title"];
+        self.version = [settings objectForKey:@"version"];
+        self.meta = settings;
+        if([[settings objectForKey:@"pages"] isKindOfClass:[NSArray class]]){
+            for(NSString* fileName in [settings objectForKey:@"pages"]){
+                if ([[NSFileManager defaultManager] fileExistsAtPath:[self.bookPath stringByAppendingPathComponent:fileName]])
+                    [self.pages addObject:[path stringByAppendingPathComponent:fileName]];
+
+            }
+        }
+        else self.pages = [self listOfPages];
+    }
+    else{
+        self.title = @"A Baker Book";
+        self.version = @"1.0";
+        self.pages = [self listOfPages];
+
+    }
     NSLog(@"Pages in this book: %d", [self totalPages]);
     return self;
 }
@@ -35,11 +60,60 @@
     return [self.pages count];
 }
 
+-(NSMutableArray*)listOfPages{
+    NSMutableArray* myPages = [NSMutableArray array];
+    NSArray *dirContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.bookPath error:nil];
+    for (NSString *fileName in dirContent) {
+        if ([[fileName pathExtension] isEqualToString:@"html"] && ![fileName isEqualToString:INDEX_FILE_NAME])
+            [myPages addObject:[self.bookPath stringByAppendingPathComponent:fileName]];
+    }
+    return myPages;
+}
+
+// ****** LOADING
+- (NSDictionary*)loadManifest:(NSString*)file {
+    /****************************************************************************************************
+	 * Reads a JSON file from Application Bundle to a NSDictionary.
+     *
+     * Requires TouchJSON with the inclusion of: #import "NSDictionary_JSONExtensions.h"
+     *
+     * Use normal NSDictionary and NSArray lookups to find elements.
+     *   [json objectForKey:@"name"]
+     *   [[json objectForKey:@"items"] objectAtIndex:1]
+	 */
+    NSDictionary *ret;
+    
+    if (file) {  
+        NSString *fileJSON = [NSString stringWithContentsOfFile:file encoding:NSUTF8StringEncoding error:nil];
+        
+        NSError *e = NULL;
+        ret = [NSDictionary dictionaryWithJSONString:fileJSON error:&e];
+    }
+    
+    /* // Testing logs
+     NSLog(@"%@", e);
+     NSLog(@"%@", ret);
+     
+     NSLog(@"Lookup, string: %@", [ret objectForKey:@"title"]);
+     NSLog(@"Lookup, sub-array: %@", [[ret objectForKey:@"pages"] objectAtIndex:1]); */
+    
+    return ret;
+}
+
 -(NSString*)indexPath{
-    return [bookPath stringByAppendingPathComponent:INDEX_FILE_NAME];
+    return [bookPath stringByAppendingPathComponent:[self indexPathComponent]];
 }
 -(NSString*)indexPathComponent{
+    if(self.meta && [[self.meta objectForKey:@"index_view"] isKindOfClass:[NSString class]]){
+        return [self.meta objectForKey:@"index_view"];
+    }
     return INDEX_FILE_NAME;
+}
+-(NSString*)manifestPath{
+    return [bookPath stringByAppendingPathComponent:MANIFEST_FILE_NAME];
+}
+-(NSString*)manifestPathComponent{
+    return MANIFEST_FILE_NAME;
 }
 
 - (int)currentPageWithURL:(NSString*)url andFirstLoad:(BOOL)isFirstLoad{

@@ -7,6 +7,8 @@
 //
 
 #import "Shelf.h"
+#import "SSZipArchive.h"
+#import "Book.h"
 
 
 @implementation Shelf
