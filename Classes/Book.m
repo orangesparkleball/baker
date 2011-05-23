@@ -104,8 +104,9 @@
     return [bookPath stringByAppendingPathComponent:[self indexPathComponent]];
 }
 -(NSString*)indexPathComponent{
-    if(self.meta && [[self.meta objectForKey:@"index_view"] isKindOfClass:[NSString class]]){
-        return [self.meta objectForKey:@"index_view"];
+    if(self.meta != nil){
+        NSString* possibleName = [self.meta objectForKey:@"index_view"];
+        if(possibleName != nil) return [self.meta objectForKey:@"index_view"];
     }
     return INDEX_FILE_NAME;
 }

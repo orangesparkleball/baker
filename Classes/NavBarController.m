@@ -63,7 +63,7 @@
     self.view = navBar;
     [self fadeOut];
     
-    UINavigationItem* navItem = [[UINavigationItem alloc] initWithTitle:@"Baker"];
+    navItem = [[UINavigationItem alloc] initWithTitle:@"Baker"];
     bookmarkButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(togglePopover)];
     [navItem setRightBarButtonItem:bookmarkButton];
     [navBar pushNavigationItem:navItem animated:NO];
@@ -102,6 +102,10 @@
 
 - (BOOL)isHidden {
     return self.view.hidden;
+}
+
+-(void)setNavTitle:(NSString*)title{
+    [navItem setTitle:title];
 }
 
 - (void)setHidden:(BOOL)hidden withAnimation:(BOOL)animation {

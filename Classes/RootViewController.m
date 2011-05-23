@@ -266,7 +266,7 @@
 	if ([self.book totalPages] > 0) {
 		
         currentPageNumber = [self.book currentPageWithURL:pageNameFromURL andFirstLoad:currentPageFirstLoading];
-		
+		[navBarController setNavTitle:[self.book title]];
 		
 		[self resetScrollView];
 		//[scrollView addSubview:prevPage];
@@ -601,7 +601,7 @@
 		// ****** Handle URI schemes
 		if (url) {
 			// Existing, checking schemes...
-			if([[url lastPathComponent] isEqualToString:[self.book indexPathComponent]]){
+			if([[url absoluteString] rangeOfString:[self.book indexPathComponent] options:(NSBackwardsSearch | NSAnchoredSearch)].location != NSNotFound){
                 NSLog(@"Matches index file name.");
                 return YES; // Let the index view load
             }

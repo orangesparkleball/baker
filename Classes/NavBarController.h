@@ -18,6 +18,7 @@
     RootViewController* rootViewController;
     UIPopoverController* popover;
     UIBarButtonItem* bookmarkButton;
+    UINavigationItem* navItem;
     Shelf* shelf;
 }
 
@@ -27,6 +28,7 @@
 
 - (id) initWithShelf:(Shelf*) newShelf andRootView:(RootViewController*)rootView;
 - (BOOL)isHidden;
+- (void)setNavTitle:(NSString*)title;
 - (void)setHidden:(BOOL)hidden withAnimation:(BOOL)animation;
 - (void)willRotate;
 - (void)resetFrameSize:(CGRect)frame;
