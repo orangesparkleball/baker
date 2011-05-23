@@ -15,7 +15,6 @@
     NSString* title;
     NSDictionary* meta;
     NSString* version;
-    NSString* url;
 }
 
 @property (nonatomic,retain) NSString* bookPath;
@@ -23,7 +22,6 @@
 @property (nonatomic,retain) NSString* title;
 @property (nonatomic,retain) NSDictionary* meta;
 @property (nonatomic,retain) NSString* version;
-@property (nonatomic,retain) NSString* url;
 
 - (Book*)initBookFromPath:(NSString*)path;
 - (NSDictionary*)loadManifest:(NSString*)file;

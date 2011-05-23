@@ -21,7 +21,6 @@
 @synthesize title;
 @synthesize meta;
 @synthesize version;
-@synthesize url;
 
 - (Book*)initBookFromPath:(NSString *)path{
     self =[super init];

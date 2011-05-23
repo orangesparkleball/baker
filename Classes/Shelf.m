@@ -22,8 +22,8 @@
 	NSString *documentsPath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
     
     // Initialize paths for books
-    self.currentBookPath = [documentsPath stringByAppendingPathComponent:@"book"];
-    self.bookStoragePath = [documentsPath stringByAppendingPathComponent:@"book-storage"];
+    self.currentBookPath = [documentsPath stringByAppendingPathComponent:@".book"];
+    self.bookStoragePath = documentsPath;
 	self.bundledBookPath = [[NSBundle mainBundle] pathForResource:@"book" ofType:nil];
     
     return self;
@@ -103,6 +103,8 @@
     }
 }
 - (NSArray*) storedBooks{
-    return [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.bookStoragePath error:nil];
+    NSArray* dirContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.bookStoragePath error:nil];
+    return [dirContents filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self ENDSWITH '.hpub'"]];
 }
+
 @end
