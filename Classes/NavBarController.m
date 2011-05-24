@@ -136,8 +136,8 @@
 }
 
 - (void)fadeOut {
-    [UIView beginAnimations:@"fadeOutIndexView" context:nil]; {
-        [UIView setAnimationDuration:0.2];
+    [UIView beginAnimations:@"fadeOutNavBar" context:nil]; {
+        [UIView setAnimationDuration:0.1];
         
         self.view.alpha = 0.0;
     }
@@ -145,7 +145,7 @@
 }
 
 - (void)fadeIn {
-    [UIView beginAnimations:@"fadeInIndexView" context:nil]; {
+    [UIView beginAnimations:@"fadeInNavBar" context:nil]; {
         [UIView setAnimationDelay:0.1];
         [UIView setAnimationDuration:0.3];
         
@@ -159,10 +159,11 @@
     CGRect frame = original_frame;
     frame.origin.y = original_frame.origin.y - 20;
     self.view.frame = frame;
-    self.view.alpha = 1.0;
-    [UIView beginAnimations:@"fadeInIndexView" context:nil]; {
+    self.view.alpha = 0.0;
+    [UIView beginAnimations:@"slideInNavBar" context:nil]; {
         [UIView setAnimationDuration:0.35];
         self.view.frame = original_frame;
+        self.view.alpha = 1.0;
     }
     [UIView commitAnimations];
 }
