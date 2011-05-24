@@ -178,18 +178,14 @@
     [[self view] addSubview:indexViewController.view];
 	[[self view] addSubview:navBarController.view];
     
-    
-    
-	
-    if ([shelf bookAvailable]){
-        [self initBook:[shelf openBook]];
-    }
-     /* else {
-      Do something if there are no books available to show...   
-      } /**/
-
 	
 	return self;
+}
+- (id) initWithAvailableBook:(BOOL)useOpenBook{
+    self = [self init];
+    if(useOpenBook)
+        [self initBook:[shelf openBook]];
+    return self;
 }
 - (void)checkPageSize {
 	if ([AVAILABLE_ORIENTATION isEqualToString:@"Portrait"] || [AVAILABLE_ORIENTATION isEqualToString:@"Landscape"]) {

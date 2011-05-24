@@ -52,8 +52,19 @@
     // Disable Shake to undo
 	application.applicationSupportsShakeToEdit = NO;
     
+	NSString *reqSysVer = @"3.2";
+	NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
+    BOOL useOpenBook = YES;
+    if ([launchOptions objectForKey:UIApplicationLaunchOptionsURLKey] != nil) {
+		NSURL *url = [launchOptions objectForKey:UIApplicationLaunchOptionsURLKey];
+        if([[url pathExtension] isEqualToString:@"hpub"] && [[url scheme] isEqualToString:@"book"]){
+            NSLog(@"Loading an external hpub - wait for handleOpenURL to init book instead of default book");
+            useOpenBook = NO;
+        }
+	}
+    
 	// Create the controller for the root view
-	self.rootViewController =[[RootViewController alloc] init];
+	self.rootViewController =[[RootViewController alloc] initWithAvailableBook:useOpenBook];
 	UIView *scrollView = [rootViewController scrollView];
 	
 	// Create the application window
@@ -67,8 +78,6 @@
 	
     [window makeKeyAndVisible];
 	
-	NSString *reqSysVer = @"3.2";
-	NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
 	if ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedDescending && [launchOptions objectForKey:UIApplicationLaunchOptionsURLKey] != nil) {
 		NSURL *url = [launchOptions objectForKey:UIApplicationLaunchOptionsURLKey];
 		[self application:application handleOpenURL:url];
@@ -85,6 +94,14 @@
 	// STOP IF: url || URLString is nil
 	if (!url || !URLString)
 		return NO;
+    
+    if([[url scheme] isEqualToString:@"file"] && [[url pathExtension] isEqualToString:@"hpub"]){
+        NSLog(@"Opening hpub from local file");
+        NSString* bookPath = [self.rootViewController.shelf handleDownloadedBookAtPath:[url path]];
+        if(bookPath == nil) return NO;
+        [self.rootViewController extractWithDialog:bookPath];
+        return  YES;
+    }
 	
 	// STOP IF: not my scheme
 	if (![[url scheme] isEqualToString:@"book"])

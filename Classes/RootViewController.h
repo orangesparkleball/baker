@@ -98,6 +98,7 @@
 @property (nonatomic, retain) NSString *URLDownload;
 
 // ****** INIT
+- (id) initWithAvailableBook:(BOOL)useOpenBook;
 - (void)checkPageSize;
 - (void)setPageSize:(NSString *)orientation;
 - (void)initBook:(Book *)book;
