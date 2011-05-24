@@ -107,9 +107,7 @@
 -(void)setNavTitle:(NSString*)title{
     [navItem setTitle:title];
 }
-
-- (void)setHidden:(BOOL)hidden withAnimation:(BOOL)animation {
-
+- (void)setHidden:(BOOL)hidden withAnimation:(BOOL)animation andFade:(BOOL)fade{
     if (animation) {
         if(hidden){
             self.view.hidden = YES;
@@ -117,7 +115,8 @@
         }
         else{
             self.view.hidden = NO;
-            [self fadeIn];
+            if(fade) [self fadeIn];
+            else [self slideIn];
         }
     } else {
         if(hidden){
@@ -129,12 +128,16 @@
             self.view.alpha = 1.0;
         }
     }
-    
+
+}
+
+- (void)setHidden:(BOOL)hidden withAnimation:(BOOL)animation {
+    [self setHidden:hidden withAnimation:animation andFade:NO];
 }
 
 - (void)fadeOut {
     [UIView beginAnimations:@"fadeOutIndexView" context:nil]; {
-        [UIView setAnimationDuration:0.0];
+        [UIView setAnimationDuration:0.2];
         
         self.view.alpha = 0.0;
     }
@@ -143,9 +146,23 @@
 
 - (void)fadeIn {
     [UIView beginAnimations:@"fadeInIndexView" context:nil]; {
-        [UIView setAnimationDuration:0.2];
+        [UIView setAnimationDelay:0.1];
+        [UIView setAnimationDuration:0.3];
         
         self.view.alpha = 1.0;
+    }
+    [UIView commitAnimations];
+}
+
+- (void)slideIn {
+    CGRect original_frame = self.view.frame;
+    CGRect frame = original_frame;
+    frame.origin.y = original_frame.origin.y - 20;
+    self.view.frame = frame;
+    self.view.alpha = 1.0;
+    [UIView beginAnimations:@"fadeInIndexView" context:nil]; {
+        [UIView setAnimationDuration:0.35];
+        self.view.frame = original_frame;
     }
     [UIView commitAnimations];
 }
@@ -158,7 +175,7 @@
 - (void)resetFrameSize:(CGRect)frame {
     BOOL hidden = [self isHidden]; // cache hidden status before setting page size
     self.view.frame = frame;
-    [self setHidden:hidden withAnimation:YES];
+    [self setHidden:hidden withAnimation:YES andFade:YES];
 }
 
 -(void)togglePopover{

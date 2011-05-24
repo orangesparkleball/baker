@@ -30,10 +30,12 @@
 - (BOOL)isHidden;
 - (void)setNavTitle:(NSString*)title;
 - (void)setHidden:(BOOL)hidden withAnimation:(BOOL)animation;
+- (void)setHidden:(BOOL)hidden withAnimation:(BOOL)animation andFade:(BOOL)fade;
 - (void)willRotate;
 - (void)resetFrameSize:(CGRect)frame;
 - (void)fadeOut;
 - (void)fadeIn;
+- (void)slideIn;
 - (void)togglePopover;
 - (void)showPopover;
 - (void)hidePopoverWithAnimation:(BOOL)anim;
