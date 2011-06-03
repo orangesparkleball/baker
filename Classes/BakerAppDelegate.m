@@ -122,7 +122,7 @@
      Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
      */
 	
-	[self saveLastPageReference];
+	//[self saveLastPageReference];
 }
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     /*
@@ -134,7 +134,7 @@
 	 Sent when the main button is pressed in iOS < 4
 	 */
 	
-	[self saveLastPageReference];
+	//[self saveLastPageReference];
 }
 
 - (void)saveLastPageReference {

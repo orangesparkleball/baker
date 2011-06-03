@@ -73,6 +73,9 @@
     return YES;
 }
 
+
+/// For listing in popover window
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     static NSString *CellIdentifier = @"Cell";
@@ -104,6 +107,7 @@
     [navBarController openBookAtPath:possibleStoragePath];
 }
 
+///--- end popover support
 
 @end
 
