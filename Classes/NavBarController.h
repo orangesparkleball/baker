@@ -12,7 +12,7 @@
 
 @class RootViewController;
 
-@interface NavBarController : UIViewController {
+@interface NavBarController : UIViewController < UINavigationBarDelegate >{
     BOOL popoverShowing;
     ShelfViewController* shelfViewController;
     RootViewController* rootViewController;

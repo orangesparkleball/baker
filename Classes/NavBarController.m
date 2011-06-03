@@ -63,10 +63,15 @@
     self.view = navBar;
     [self fadeOut];
     
-    navItem = [[UINavigationItem alloc] initWithTitle:@"Baker"];
+    navItem = [[UINavigationItem alloc] initWithTitle:@"Shelf"];
+    [navBar pushNavigationItem:navItem animated:NO];
+    
+    navItem = [[UINavigationItem alloc] initWithTitle:@"Book"];
     bookmarkButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(togglePopover)];
     [navItem setRightBarButtonItem:bookmarkButton];
+    
     [navBar pushNavigationItem:navItem animated:NO];
+    
     [navBar release];
     
     self.shelfViewController = [[ShelfViewController alloc] initWithShelf:shelf
@@ -201,6 +206,27 @@
     [self hidePopoverWithAnimation:YES];
     [rootViewController hideStatusBar];
     [rootViewController extractWithDialog:path];
+}
+
+- (void)navigationBar:(UINavigationBar *)navigationBar didPopItem:(UINavigationItem *)item{
+    if([item hidesBackButton]){
+        NSLog(@"This is the shelf");
+    }
+    else{
+        NSLog(@"Book was %@", [item title]);
+    }
+}
+
+- (void)navigationBar:(UINavigationBar *)navigationBar didPushItem:(UINavigationItem *)item{
+    
+}
+
+- (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item{
+    return !([[item title] isEqualToString:@"Shelf"]);
+}
+
+- (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPushItem:(UINavigationItem *)item{
+    return YES;
 }
 
 @end
