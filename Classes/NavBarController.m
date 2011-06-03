@@ -8,6 +8,7 @@
 
 #import "NavBarController.h"
 #import "RootViewController.h"
+#import "BakerReaderWindow.h"
 
 
 
@@ -16,12 +17,14 @@
 
 @synthesize shelfViewController;
 @synthesize rootViewController;
+@synthesize readerWindow;
 @synthesize shelf;
 
-- (id) initWithShelf:(Shelf*) newShelf andRootView:(RootViewController*)rootView{
+- (id) initWithShelf:(Shelf*) newShelf andReaderWindow:(BakerReaderWindow*)window{
     self = [self initWithNibName:nil bundle:nil];
     self.shelf = newShelf;
-    self.rootViewController = rootView;
+    self.rootViewController = window.bookViewController;
+    self.readerWindow = window;
     return self;
 }
 
@@ -204,7 +207,7 @@
 
 -(void)openBookAtPath:(NSString*)path{
     [self hidePopoverWithAnimation:YES];
-    [rootViewController hideStatusBar];
+    [self.readerWindow hideStatusBar];
     [rootViewController extractWithDialog:path];
 }
 

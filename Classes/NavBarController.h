@@ -10,12 +10,13 @@
 #import "ShelfViewController.h"
 #import "Shelf.h"
 
-@class RootViewController;
+@class RootViewController, BakerReaderWindow;
 
 @interface NavBarController : UIViewController < UINavigationBarDelegate >{
     BOOL popoverShowing;
     ShelfViewController* shelfViewController;
     RootViewController* rootViewController;
+    BakerReaderWindow* readerWindow;
     UIPopoverController* popover;
     UIBarButtonItem* bookmarkButton;
     UINavigationItem* navItem;
@@ -24,9 +25,10 @@
 
 @property (nonatomic,retain) ShelfViewController* shelfViewController;
 @property (nonatomic,retain) RootViewController* rootViewController;
+@property (nonatomic,retain) BakerReaderWindow* readerWindow;
 @property (nonatomic,retain) Shelf* shelf;
 
-- (id) initWithShelf:(Shelf*) newShelf andRootView:(RootViewController*)rootView;
+- (id) initWithShelf:(Shelf*) newShelf andReaderWindow:(BakerReaderWindow*)window;
 - (BOOL)isHidden;
 - (void)setNavTitle:(NSString*)title;
 - (void)setHidden:(BOOL)hidden withAnimation:(BOOL)animation;

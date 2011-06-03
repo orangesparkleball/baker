@@ -31,6 +31,7 @@
 
 #import <QuartzCore/QuartzCore.h>
 #import "RootViewController.h"
+#import "BakerReaderWindow.h"
 #import "Downloader.h"
 #import "NSDictionary_JSONExtensions.h"
 
@@ -104,6 +105,7 @@
 @synthesize currentPageNumber;
 
 @synthesize URLDownload;
+@synthesize readerWindow;
 
 // ****** INIT
 - (id)init {
@@ -119,9 +121,7 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadBook:) name:@"downloadNotification" object:nil];
 	
 	[self checkPageSize];
-    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
 	
-	discardNextStatusBarToggle = NO;
 	stackedScrollingAnimations = 0;
 	
 	// ****** SCROLLVIEW INIT
@@ -168,21 +168,19 @@
     indexViewController = [[IndexViewController alloc] initWithBookBundlePath:[shelf bundledBookPath] documentsBookPath:[shelf currentBookPath] fileName:INDEX_FILE_NAME webViewDelegate:self];
     
     self.shelf = [[Shelf alloc] init];
-    navBarController = [[NavBarController alloc] initWithShelf: self.shelf andRootView:self];
-    [navBarController setHidden:YES withAnimation:NO];
-	[self hideStatusBar];
+	
 	[self checkPageSize];
     
     
     // ****** INDEX WEBVIEW INIT
     [[self view] addSubview:indexViewController.view];
-	[[self view] addSubview:navBarController.view];
     
 	
 	return self;
 }
-- (id) initWithAvailableBook:(BOOL)useOpenBook{
+- (id) initWithAvailableBook:(BOOL)useOpenBook andReaderWindow:(id)window{
     self = [self init];
+    self.readerWindow = window;
     if(useOpenBook)
         [self initBook:[shelf openBook]];
     return self;
@@ -212,14 +210,14 @@
 	}
     
     // Tell the nav bar about our resize
-    CGRect bounds = scrollView.bounds;
-    CGSize navBarSize = [navBarController.view sizeThatFits:bounds.size];
+    //CGRect bounds = scrollView.bounds;
+    // CGSize navBarSize = [navBarController.view sizeThatFits:bounds.size];
     UIApplication *sharedApplication = [UIApplication sharedApplication];
 	int scrollViewY = 20;
 	if (!sharedApplication.statusBarHidden) {
 		scrollViewY = 0;
 	}
-    [navBarController resetFrameSize:CGRectMake(0, scrollViewY, navBarSize.width, navBarSize.height)];
+    //[navBarController resetFrameSize:CGRectMake(0, scrollViewY, navBarSize.width, navBarSize.height)];
 }
 - (void)resetScrollView {
 	for (id subview in scrollView.subviews) {
@@ -262,7 +260,7 @@
 	if ([self.book totalPages] > 0) {
 		
         currentPageNumber = [self.book currentPageWithURL:pageNameFromURL andFirstLoad:currentPageFirstLoading];
-		[navBarController setNavTitle:[self.book title]];
+		//[navBarController setNavTitle:[self.book title]];
 		
 		[self resetScrollView];
 		//[scrollView addSubview:prevPage];
@@ -368,7 +366,7 @@
         scrollView.scrollEnabled = NO;
         stackedScrollingAnimations++;
         
-        [self hideStatusBar];
+        [self.readerWindow hideStatusBar];
         [scrollView scrollRectToVisible:[self frameForPage:currentPageNumber] animated:YES];
         [self gotoPageDelayer];
         
@@ -506,7 +504,7 @@
 }
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
 	// This is called because this controller is the delegate for UIScrollView
-	[self hideStatusBar];
+	[self.readerWindow hideStatusBar];
 }
 - (void)scrollViewDidEndDragging:(UIScrollView *)scroll willDecelerate:(BOOL)decelerate {
 	// Nothing to do here...
@@ -589,7 +587,7 @@
 		
 	} else {
 		
-		[self hideStatusBarDiscardingToggle:YES];
+		[self.readerWindow hideStatusBarDiscardingToggle:YES];
 		
 		NSURL *url = [request URL];
 		NSLog(@"Current Page IS NOT delaying loading --> handle clicked link: %@", [url absoluteString]);
@@ -717,13 +715,10 @@
 		
         [self changePage:page];
         
-	} else if (touch.tapCount == 2) {
-		[self performSelector:@selector(toggleStatusBar) withObject:nil];
 	}
 }
 - (void)userDidScroll:(UITouch *)touch {
-	NSLog(@"User did scroll");
-	[self hideStatusBar];
+	[self hideIndexView];
 }
 
 // ****** PAGE SCROLLING
@@ -774,7 +769,7 @@
 
 }
 - (void)scrollPage:(UIWebView *)webView to:(NSString *)offset animating:(BOOL)animating {
-	[self hideStatusBar];
+	[self.readerWindow hideStatusBar];
 	
 	NSString *jsCommand = [NSString stringWithFormat:@"window.scrollTo(0,%@);", offset];
 	
@@ -814,32 +809,17 @@
 }
 
 // ****** STATUS BAR
-- (void)toggleStatusBar {
-	if (discardNextStatusBarToggle) {
-		// do nothing, but reset the variable
-		discardNextStatusBarToggle = NO;
-	} else {
-		NSLog(@"TOGGLE status bar");
-		UIApplication *sharedApplication = [UIApplication sharedApplication];
-        BOOL willHide = !sharedApplication.statusBarHidden;
-		[sharedApplication setStatusBarHidden:willHide withAnimation:UIStatusBarAnimationSlide];
-        if(![indexViewController isDisabled]) 
-            [indexViewController setIndexViewHidden:![indexViewController isIndexViewHidden] withAnimation:YES];
-        [navBarController setHidden:willHide withAnimation:YES];
-        
-	}
+- (void)toggleIndexView {
+    NSLog(@"TOGGLE view bar");
+    if(![indexViewController isDisabled]) 
+        [indexViewController setIndexViewHidden:![indexViewController isIndexViewHidden] withAnimation:YES];
 }
-- (void)hideStatusBar {
-	[self hideStatusBarDiscardingToggle:NO];
-}
-- (void)hideStatusBarDiscardingToggle:(BOOL)discardToggle {
-	NSLog(@"HIDE status bar %@", (discardToggle ? @"discarding toggle" : @""));
-	discardNextStatusBarToggle = discardToggle;
-	[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
+
+- (void)hideIndexView {
     if(![indexViewController isDisabled]) 
         [indexViewController setIndexViewHidden:YES withAnimation:YES];
-    [navBarController setHidden:YES withAnimation:YES];
 }
+
 
 // ****** DOWNLOAD NEW BOOKS
 - (void)downloadBook:(NSNotification *)notification {
@@ -965,7 +945,7 @@
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     // Notify the other views
     [indexViewController willRotate];
-    [navBarController willRotate];
+    //[navBarController willRotate];
     
     // Since the UIWebView doesn't handle orientationchange events correctly we have to do handle them ourselves 
     // 1. Set the correct value for window.orientation property

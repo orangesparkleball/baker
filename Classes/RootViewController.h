@@ -37,7 +37,7 @@
 #import "Shelf.h"
 #import "Book.h"
 
-@class Downloader;
+@class Downloader, BakerReaderWindow;
 
 @interface RootViewController : UIViewController < UIWebViewDelegate, UIScrollViewDelegate > {
 	
@@ -77,7 +77,7 @@
 	UIAlertView *feedbackAlert;
     
     IndexViewController *indexViewController;
-    NavBarController  *navBarController;
+    BakerReaderWindow  *readerWindow;
 }
 
 @property (nonatomic, retain) Shelf *shelf;
@@ -92,13 +92,14 @@
 @property (nonatomic, retain) UIWebView *prevPage;
 @property (nonatomic, retain) UIWebView *currPage;
 @property (nonatomic, retain) UIWebView *nextPage;
+@property (nonatomic, retain) BakerReaderWindow *readerWindow;
 
 @property int currentPageNumber;
 
 @property (nonatomic, retain) NSString *URLDownload;
 
 // ****** INIT
-- (id) initWithAvailableBook:(BOOL)useOpenBook;
+- (id) initWithAvailableBook:(BOOL)useOpenBook andReaderWindow:(BakerReaderWindow*)window;
 - (void)checkPageSize;
 - (void)setPageSize:(NSString *)orientation;
 - (void)initBook:(Book *)book;
@@ -131,10 +132,10 @@
 - (void)scrollPage:(UIWebView *)webView to:(NSString *)offset animating:(BOOL)animating;
 - (void)handleAnchor:(BOOL)animating;
 
+- (void)toggleIndexView;
+- (void)hideIndexView;
+
 // ****** STATUS BAR
-- (void)toggleStatusBar;
-- (void)hideStatusBar;
-- (void)hideStatusBarDiscardingToggle:(BOOL)discardToggle;
 
 // ****** DOWNLOAD NEW BOOKS
 - (void)downloadBook:(NSNotification *)notification;
