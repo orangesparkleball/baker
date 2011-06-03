@@ -32,7 +32,7 @@
 
 #import "BakerAppDelegate.h"
 #import "RootViewController.h"
-#import "InterceptorWindow.h"
+#import "BakerReaderWindow.h"
 
 @implementation BakerAppDelegate
 
@@ -68,13 +68,13 @@
 	UIView *scrollView = [rootViewController scrollView];
 	
 	// Create the application window
-	UIWindow *localWindow = [[InterceptorWindow alloc] initWithTarget:scrollView eventsDelegate:self.rootViewController frame:[[UIScreen mainScreen]bounds]];
+	UIWindow *localWindow = [[BakerReaderWindow alloc] initWithFrame:[[UIScreen mainScreen]bounds]];
 	localWindow.backgroundColor = [UIColor whiteColor];
 	self.window = localWindow;
 	[localWindow release];
 	
 	// Add the root view to the application window
-	[window addSubview:[rootViewController view]];
+	//[window addSubview:[rootViewController view]];
 	
     [window makeKeyAndVisible];
 	
