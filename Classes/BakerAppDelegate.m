@@ -64,19 +64,15 @@
 	}
     
 	// Create the controller for the root view
-	self.rootViewController =[[RootViewController alloc] initWithAvailableBook:useOpenBook];
-	UIView *scrollView = [rootViewController scrollView];
 	
 	// Create the application window
 	UIWindow *localWindow = [[BakerReaderWindow alloc] initWithFrame:[[UIScreen mainScreen]bounds]];
-	localWindow.backgroundColor = [UIColor whiteColor];
 	self.window = localWindow;
-	[localWindow release];
 	
 	// Add the root view to the application window
 	//[window addSubview:[rootViewController view]];
 	
-    [window makeKeyAndVisible];
+    [self.window makeKeyAndVisible];
 	
 	if ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedDescending && [launchOptions objectForKey:UIApplicationLaunchOptionsURLKey] != nil) {
 		NSURL *url = [launchOptions objectForKey:UIApplicationLaunchOptionsURLKey];
