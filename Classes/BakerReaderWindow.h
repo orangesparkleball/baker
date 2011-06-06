@@ -7,14 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-@class RootViewController, Shelf, NavBarController;
+@class RootViewController, Shelf, ReaderViewController;
 
 @interface BakerReaderWindow : UIWindow {
 	BOOL scrolling, discardNextStatusBarToggle;
 }
-@property (nonatomic) BOOL bookViewActive;
-@property (nonatomic, retain) RootViewController* bookViewController;
-@property (nonatomic, retain) NavBarController* navBarController;
+@property (nonatomic, retain) ReaderViewController* readerViewController;
 @property (nonatomic, retain) Shelf* shelf;
 
 - (id)initWithFrame:(CGRect)frame andUseOpenBook:(BOOL)useOpenBook;

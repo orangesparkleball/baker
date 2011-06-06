@@ -12,11 +12,9 @@
 @implementation ShelfViewController
 
 @synthesize shelf;
-@synthesize navBarController;
 
-- (id) initWithShelf:(Shelf*) newShelf andNavBar:(NavBarController*)navBar{
+- (id) initWithShelf:(Shelf*) newShelf{
     self.shelf = newShelf;
-    self.navBarController = navBar;
     self = [self initWithStyle:UITableViewStylePlain];
     return self;
 }
@@ -104,7 +102,6 @@
     NSString* item = [[shelf storedBooks] objectAtIndex:indexPath.row];
     NSString* possibleStoragePath = [shelf containsStoredBook:item];
     NSLog(@"Tapped on %@", item );
-    [navBarController openBookAtPath:possibleStoragePath];
 }
 
 ///--- end popover support

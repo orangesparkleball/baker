@@ -209,15 +209,6 @@
 		pageHeight = screenBounds.size.width;
 	}
     
-    // Tell the nav bar about our resize
-    //CGRect bounds = scrollView.bounds;
-    // CGSize navBarSize = [navBarController.view sizeThatFits:bounds.size];
-    UIApplication *sharedApplication = [UIApplication sharedApplication];
-	int scrollViewY = 20;
-	if (!sharedApplication.statusBarHidden) {
-		scrollViewY = 0;
-	}
-    //[navBarController resetFrameSize:CGRectMake(0, scrollViewY, navBarSize.width, navBarSize.height)];
 }
 - (void)resetScrollView {
 	for (id subview in scrollView.subviews) {
@@ -228,12 +219,8 @@
 
 	scrollView.contentSize = CGSizeMake(pageWidth * [self.book totalPages], pageHeight);
 	
-	UIApplication *sharedApplication = [UIApplication sharedApplication];
-	int scrollViewY = 0;
-	if (!sharedApplication.statusBarHidden) {
-		scrollViewY = -20;
-	}
-	scrollView.frame = CGRectMake(0, scrollViewY, pageWidth, pageHeight);
+	
+	scrollView.frame = CGRectMake(0, 0, pageWidth, pageHeight);
 	
 	[self initPageNumbersForPages:[self.book totalPages]];
 

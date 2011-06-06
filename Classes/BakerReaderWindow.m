@@ -10,15 +10,13 @@
 #import "Shelf.h"
 #import "NavBarController.h"
 #import "RootViewController.h"
+#import "ReaderViewController.h"
 
 
 @implementation BakerReaderWindow
 
 @synthesize shelf;
-
-@synthesize bookViewActive;
-@synthesize bookViewController;
-@synthesize navBarController;
+@synthesize readerViewController;
 
 - (id)initWithFrame:(CGRect)aRect{
     return [self initWithFrame:aRect andUseOpenBook:YES];
@@ -26,20 +24,10 @@
 
 - (id)initWithFrame:(CGRect)frame andUseOpenBook:(BOOL)useOpenBook{
     self = [super initWithFrame:frame];
-    
 	discardNextStatusBarToggle = NO;
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
-    
-    self.bookViewActive = true;
-    self.bookViewController = [[RootViewController alloc] initWithAvailableBook:useOpenBook andReaderWindow:self];
-    
-    [self addSubview:[self.bookViewController view]];
-    
-    self.shelf = [[Shelf alloc] init];
-    
-    self.navBarController = [[NavBarController alloc] initWithShelf:self.shelf andReaderWindow:self];
-    [self.navBarController setHidden:YES withAnimation:NO];
-	[self addSubview:navBarController.view];
+    self.readerViewController = [[ReaderViewController alloc] initWithWindow:self];
+    [self addSubview:[self.readerViewController view] ];
     
     [self hideStatusBar];
     
@@ -90,34 +78,19 @@
 }
 
 - (UIView*)currentTargetView{
-    if(self.bookViewActive){
-        [self.bookViewController scrollView];
-    }
-    else{
-        
-    }
+    return [self.readerViewController currentTargetView];
 }
 
 
 - (void)forwardTap:(UITouch *)touch {
-    if(self.bookViewActive){
-        if(touch.tapCount >= 2) 
-            [self toggleStatusBar];
-        [self.bookViewController userDidTap:touch];
-    }
-    else{
-        
-    }
+    if(touch.tapCount >= 2) 
+        [self toggleStatusBar];
+    [self.readerViewController userDidTap:touch];
 }
 - (void)forwardScroll:(UITouch *)touch {
-    if(self.bookViewActive){
-        NSLog(@"User did scroll");
-        [self hideStatusBar];
-        [self.bookViewController userDidScroll:touch];
-    }
-    else{
-        
-    }
+    NSLog(@"User did scroll");
+    [self hideStatusBar];
+    [self.readerViewController userDidScroll:touch];
 }
 
 - (void)toggleStatusBar {
@@ -129,8 +102,8 @@
 		UIApplication *sharedApplication = [UIApplication sharedApplication];
         BOOL willHide = !sharedApplication.statusBarHidden;
 		[sharedApplication setStatusBarHidden:willHide withAnimation:UIStatusBarAnimationSlide];
-        [self.bookViewController toggleIndexView];
-        [self.navBarController setHidden:willHide withAnimation:YES];
+        [self.readerViewController windowSetStatusBarTo:willHide];
+        //[self.navBarController setHidden:willHide withAnimation:YES];
 	}
 }
 
@@ -142,8 +115,8 @@
 	NSLog(@"HIDE status bar %@", (discardToggle ? @"discarding toggle" : @""));
 	discardNextStatusBarToggle = discardToggle;
 	[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
-    [self.bookViewController hideIndexView];
-    [navBarController setHidden:YES withAnimation:YES];
+    [self.readerViewController windowHidStatusBar];
+    //[navBarController setHidden:YES withAnimation:YES];
 }
 
 
