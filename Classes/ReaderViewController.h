@@ -13,7 +13,6 @@
 @interface ReaderViewController : UINavigationController {
     
 }
-@property (nonatomic) BOOL bookViewActive;
 @property (nonatomic, retain) BakerReaderWindow* readerWindow;
 @property (nonatomic, retain) RootViewController* bookViewController;
 @property (nonatomic, retain) ShelfViewController* shelfViewController;
@@ -24,5 +23,7 @@
 - (void)userDidTap:(UITouch *)touch;
 - (void)userDidScroll:(UITouch *)touch;
 - (void)windowSetStatusBarTo:(BOOL)status;
+- (BOOL)bookViewActive;
 - (void)windowHidStatusBar;
+- (void)extractBookAt:(NSString*)path;
 @end

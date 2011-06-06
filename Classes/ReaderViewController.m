@@ -15,7 +15,6 @@
 
 @synthesize readerWindow;
 @synthesize shelf;
-@synthesize bookViewActive;
 @synthesize bookViewController;
 @synthesize shelfViewController;
 
@@ -33,18 +32,16 @@
     self = [self initWithNibName:nil bundle:nil];
     if (self){
         self.readerWindow = oldreaderWindow;
-        self.bookViewActive = true;
         self.bookViewController = [[RootViewController alloc] initWithAvailableBook:YES andReaderWindow:oldreaderWindow];
         
         
         
         self.shelf = [[Shelf alloc] init];
-        self.shelfViewController = [[ShelfViewController alloc] initWithShelf:self.shelf];
+        self.shelfViewController = [[ShelfViewController alloc] initWithShelf:self.shelf andReaderWindow:self.readerWindow];
         
         
         [self pushViewController:self.shelfViewController animated:NO];
         [self pushViewController:self.bookViewController animated:NO];
-        self.bookViewActive = YES;
     }
     return self;
 }
@@ -52,6 +49,10 @@
 - (void)dealloc
 {
     [super dealloc];
+}
+
+- (BOOL)bookViewActive{
+    return ([self visibleViewController] == self.bookViewController);
 }
 
 - (void)didReceiveMemoryWarning
@@ -93,7 +94,7 @@
 }
 
 - (UIView*)currentTargetView{
-    if(self.bookViewActive){
+    if([self bookViewActive]){
         [self.bookViewController scrollView];
     }
     else{
@@ -102,7 +103,7 @@
 }
 
 - (void)userDidTap:(UITouch *)touch {
-    if(self.bookViewActive){
+    if([self bookViewActive]){
         [self.bookViewController userDidTap:touch];
     }
     else{
@@ -111,7 +112,7 @@
 
 }
 - (void)userDidScroll:(UITouch *)touch {
-    if(self.bookViewActive){
+    if([self bookViewActive]){
         [self.bookViewController userDidScroll:touch];
     }
     else{
@@ -127,5 +128,15 @@
 - (void)windowHidStatusBar{
     [self.bookViewController hideIndexView];
     [self setNavigationBarHidden:YES animated:YES];
+}
+
+- (void)extractBookAt:(NSString *)path{
+    // eventually - hide popover if exists
+    @try{
+        [self pushViewController:bookViewController animated:YES];
+    }
+    @finally{
+        [self.bookViewController performSelector:@selector(extractWithDialog:) withObject:path afterDelay:0.1];
+    }
 }
 @end

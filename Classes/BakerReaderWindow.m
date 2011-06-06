@@ -8,7 +8,6 @@
 
 #import "BakerReaderWindow.h"
 #import "Shelf.h"
-#import "NavBarController.h"
 #import "RootViewController.h"
 #import "ReaderViewController.h"
 
@@ -105,6 +104,12 @@
         [self.readerViewController windowSetStatusBarTo:willHide];
         //[self.navBarController setHidden:willHide withAnimation:YES];
 	}
+}
+
+
+-(void)openBookAtPath:(NSString*)path{
+    [self hideStatusBar];
+    [self.readerViewController extractBookAt:path];
 }
 
 - (void)hideStatusBar {

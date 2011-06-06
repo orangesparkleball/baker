@@ -9,15 +9,17 @@
 #import <UIKit/UIKit.h>
 #import "Shelf.h"
 
+@class BakerReaderWindow;
 
 @interface ShelfViewController : UITableViewController <UITableViewDataSource, UITableViewDelegate>{
     Shelf* shelf;
 }
 
 @property (nonatomic,retain) Shelf* shelf;
+@property (nonatomic,retain) BakerReaderWindow* readerWindow;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 - (int)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
-- (id) initWithShelf:(Shelf*) newShelf;
+- (id) initWithShelf:(Shelf*) newShelf andReaderWindow:(BakerReaderWindow*)myWindow;
 
 @end

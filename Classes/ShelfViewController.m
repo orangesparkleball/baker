@@ -7,14 +7,15 @@
 //
 
 #import "ShelfViewController.h"
-#import "NavBarController.h"
-
+#import "BakerReaderWindow.h"
 @implementation ShelfViewController
 
 @synthesize shelf;
+@synthesize readerWindow;
 
-- (id) initWithShelf:(Shelf*) newShelf{
+- (id) initWithShelf:(Shelf*) newShelf andReaderWindow:(BakerReaderWindow*)myWindow{
     self.shelf = newShelf;
+    self.readerWindow = myWindow;
     self = [self initWithStyle:UITableViewStylePlain];
     return self;
 }
@@ -91,6 +92,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    NSLog(@"Book count %d", [[shelf storedBooks] count] );
     return [[shelf storedBooks] count];
 }
 
@@ -101,7 +103,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSString* item = [[shelf storedBooks] objectAtIndex:indexPath.row];
     NSString* possibleStoragePath = [shelf containsStoredBook:item];
-    NSLog(@"Tapped on %@", item );
+    NSLog(@"Tapped on %@", possibleStoragePath );
+    [self.readerWindow openBookAtPath:possibleStoragePath];
 }
 
 ///--- end popover support

@@ -32,7 +32,6 @@
 
 #import <UIKit/UIKit.h>
 #import "IndexViewController.h"
-#import "NavBarController.h"
 
 #import "Shelf.h"
 #import "Book.h"

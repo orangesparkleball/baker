@@ -20,10 +20,11 @@
 - (void)forwardTap:(UITouch *)touch;
 - (void)forwardScroll:(UITouch *)touch;
 
+-(void)openBookAtPath:(NSString*)path;
+
 // Status/Nav bar
 - (void)toggleStatusBar;
 - (void)hideStatusBar;
 - (void)hideStatusBarDiscardingToggle:(BOOL)discardToggle;
-
 
 @end
