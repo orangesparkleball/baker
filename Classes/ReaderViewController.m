@@ -32,9 +32,9 @@
     self = [self initWithNibName:nil bundle:nil];
     if (self){
         self.readerWindow = oldreaderWindow;
+        
+        [self.navigationBar setBarStyle:UIBarStyleBlack];
         self.bookViewController = [[RootViewController alloc] initWithAvailableBook:YES andReaderWindow:oldreaderWindow];
-        
-        
         
         self.shelf = [[Shelf alloc] init];
         self.shelfViewController = [[ShelfViewController alloc] initWithShelf:self.shelf andReaderWindow:self.readerWindow];
