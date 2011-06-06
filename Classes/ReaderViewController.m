@@ -95,10 +95,10 @@
 
 - (UIView*)currentTargetView{
     if([self bookViewActive]){
-        [self.bookViewController scrollView];
+        return [self.bookViewController scrollView];
     }
     else{
-        
+        return [self.shelfViewController view];
     }
 }
 
